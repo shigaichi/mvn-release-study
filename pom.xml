@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.shigaichi</groupId>
     <artifactId>mvn-release-study</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.4-SNAPSHOT</version>
     <name>mvn-release-study</name>
     <!-- https://central.sonatype.com/artifact/io.github.shigaichi/mvn-release-study/overview -->
     <description>JavaライブラリをMaven Centralへ公開するための練習用プロジェクト</description>
