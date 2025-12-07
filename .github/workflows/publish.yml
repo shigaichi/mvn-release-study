@@ -1,4 +1,4 @@
-name: Publish to Maven Central
+name: Publish to Maven Central & GitHub Pages
 
 on:
   workflow_dispatch:
@@ -6,26 +6,27 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
-#    permissions:
-#      contents: read
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-#      - name: Set up JDK 11
-#        uses: actions/setup-java@v5
-#        with:
-#          distribution: temurin
-#          java-version: '21'
-#
-#      - name: Publish to GitHub Packages Apache Maven
-#        run: mvn -B -ntp -Dgpg.skip=true clean deploy
-#        env:
-#          GITHUB_TOKEN: ${{ github.token }} # GITHUB_TOKEN is the default env for the password
+      #      - name: Set up JDK 11
+      #        uses: actions/setup-java@v5
+      #        with:
+      #          distribution: temurin
+      #          java-version: '21'
+      #
+      #      - name: Publish to GitHub Packages Apache Maven
+      #        run: mvn -B -ntp -Dgpg.skip=true clean deploy
+      #        env:
+      #          GITHUB_TOKEN: ${{ github.token }} # GITHUB_TOKEN is the default env for the password
 
       - name: Set up Java and Maven
         uses: actions/setup-java@v5
@@ -44,4 +45,43 @@ jobs:
         env:
           MAVEN_CENTRAL_USERNAME: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
           MAVEN_CENTRAL_PASSWORD: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_PASSPHRASE }}
+
+  build-site:
+    needs: publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build site
+        run: mvn -B -ntp clean site
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: target/site
+
+  deploy-site:
+    needs: build-site
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
