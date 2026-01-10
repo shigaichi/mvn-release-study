@@ -107,7 +107,7 @@
                 <version>0.9.0</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <publishingServerId>central2</publishingServerId>
+                    <publishingServerId>central</publishingServerId>
                     <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
